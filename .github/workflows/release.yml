@@ -1,0 +1,42 @@
+name: Build and Push ghost
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build base
+        run: docker build -f Dockerfile.base -t ghost-base .
+
+      - name: Build runtime
+        run: docker build -f Dockerfile.runtime -t ghost-runtime .
+
+      - name: Build and push
+        run: |
+          docker build -f Dockerfile -t ghcr.io/ghostconductor/ghost:${{ github.ref_name }} .
+          docker tag ghcr.io/ghostconductor/ghost:${{ github.ref_name }} ghcr.io/ghostconductor/ghost:latest
+          docker push ghcr.io/ghostconductor/ghost:${{ github.ref_name }}
+          docker push ghcr.io/ghostconductor/ghost:latest
+
+      - name: Create GitHub Release
+              uses: softprops/action-gh-release@v2
+              with:
+                body: "Docker image: ghcr.io/ghostconductor/ghost:${{ github.ref_name }}"

@@ -1,0 +1,11 @@
+# gc-ghost-runtime
+# Layer 2: Python dependencies — all providers
+FROM ghost-base
+
+COPY requirements.txt requirements.anthropic.txt requirements.openai.txt requirements.gemini.txt ./
+
+RUN pip install --no-cache-dir \
+    -r requirements.txt \
+    -r requirements.anthropic.txt \
+    -r requirements.openai.txt \
+    -r requirements.gemini.txt

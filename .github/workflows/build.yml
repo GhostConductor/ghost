@@ -1,0 +1,35 @@
+name: Build and Push dev image
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build base
+        run: docker build -f Dockerfile.base -t ghost-base .
+
+      - name: Build runtime
+        run: docker build -f Dockerfile.runtime -t ghost-runtime .
+
+      - name: Build and push dev
+        run: |
+          docker build -f Dockerfile -t ghcr.io/ghostconductor/ghost:dev .
+          docker push ghcr.io/ghostconductor/ghost:dev
