@@ -37,6 +37,6 @@ jobs:
           docker push ghcr.io/ghostconductor/ghost:latest
 
       - name: Create GitHub Release
-              uses: softprops/action-gh-release@v2
-              with:
-                body: "Docker image: ghcr.io/ghostconductor/ghost:${{ github.ref_name }}"
+        uses: softprops/action-gh-release@v2
+        with:
+          body: "Docker image: ghcr.io/ghostconductor/ghost:${{ github.ref_name }}"
